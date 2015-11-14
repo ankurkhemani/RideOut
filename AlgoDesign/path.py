@@ -93,21 +93,21 @@ def ParseInputFile(graph):
     return
 
 
-def breadthFirstSearch(graph,d_source,d_dest,r_source,r_dest):
+def breadthFirstSearch(graph,source,dest):
 
     fringe = util.Queue()
-    fringe.enqueue( (d_source,[],[d_source]) )
+    fringe.enqueue( (source,[],[source]) )
 
-    print "\nBFS:",graph
+    #print "\nBFS:",graph
 
     while fringe.isEmpty() == False:
         node,visited,path = fringe.dequeue()
-        print "node,visited,path:",node,visited,path
+        #print "node,visited,path:",node,visited,path
 
         for nextNode in sorted(getSuccessors(graph,node)):
-            print "nextNode:",nextNode
+            #print "nextNode:",nextNode
             if not nextNode in visited:
-                if isGoalNode(graph,d_dest,nextNode):
+                if isGoalNode(graph,dest,nextNode):
                     return path + [nextNode]
                 #fringe.enqueue( (nextNode,time+1,visited + [nextNode]) )
                 fringe.enqueue( (nextNode,visited + [node],path + [nextNode]) )
@@ -115,22 +115,22 @@ def breadthFirstSearch(graph,d_source,d_dest,r_source,r_dest):
     return 'None',''
 
 
-def depthFirstSearch(graph,d_source,d_dest,r_source,r_dest):
+def depthFirstSearch(graph,source,dest):
 
     frontier = util.Stack()
-    frontier.push( (d_source,[]) )
+    frontier.push( (source,[]) )
     explored = []
 
     while frontier.isEmpty() == False:
 
         node,path = frontier.pop()
 
-        if isGoalNode(graph,d_dest,node):
+        if isGoalNode(graph,dest,node):
             return path + [node]
 
         explored.append(node)
         for nextNode in sorted(getSuccessors(graph,node),reverse=True):
-            print "nextNode:",nextNode
+            #print "nextNode:",nextNode
             if not nextNode in explored:
                 frontier.push( (nextNode,path + [node]) )
 
@@ -146,8 +146,10 @@ def main():
     driver_dest = 'G'
     rider_source = 'B'
     rider_dest = 'I'
-    #path = breadthFirstSearch(graph,driver_source,driver_dest,rider_source,rider_dest)
-    path = depthFirstSearch(graph,driver_source,driver_dest,rider_source,rider_dest)
+    driver_waypt = 'H'
+    path = breadthFirstSearch(graph,driver_source,driver_dest)
+    print path
+    path = depthFirstSearch(graph,driver_source,driver_dest)
     print path
 
 if __name__ == '__main__':
