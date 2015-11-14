@@ -108,10 +108,31 @@ def breadthFirstSearch(graph,d_source,d_dest,r_source,r_dest):
             print "nextNode:",nextNode
             if not nextNode in visited:
                 if isGoalNode(graph,d_dest,nextNode):
-                    return path
+                    return path + [nextNode]
                 #fringe.enqueue( (nextNode,time+1,visited + [nextNode]) )
                 fringe.enqueue( (nextNode,visited + [node],path + [nextNode]) )
-            raw_input()
+
+    return 'None',''
+
+
+def depthFirstSearch(graph,d_source,d_dest,r_source,r_dest):
+
+    frontier = util.Stack()
+    frontier.push( (d_source,[]) )
+    explored = []
+
+    while frontier.isEmpty() == False:
+
+        node,path = frontier.pop()
+
+        if isGoalNode(graph,d_dest,node):
+            return path + [node]
+
+        explored.append(node)
+        for nextNode in sorted(getSuccessors(graph,node),reverse=True):
+            print "nextNode:",nextNode
+            if not nextNode in explored:
+                frontier.push( (nextNode,path + [node]) )
 
     return 'None',''
 
@@ -125,7 +146,8 @@ def main():
     driver_dest = 'G'
     rider_source = 'B'
     rider_dest = 'I'
-    path = breadthFirstSearch(graph,driver_source,driver_dest,rider_source,rider_dest)
+    #path = breadthFirstSearch(graph,driver_source,driver_dest,rider_source,rider_dest)
+    path = depthFirstSearch(graph,driver_source,driver_dest,rider_source,rider_dest)
     print path
 
 if __name__ == '__main__':
