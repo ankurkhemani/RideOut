@@ -78,11 +78,7 @@ public class HomeFragment extends Fragment {
     ArrayList<LatLng> myLatLng = new ArrayList<LatLng>();
     private static double RADIUS = 2000;
 
-	private static final LatLng LOWER_MANHATTAN = new LatLng(40.722543,
-			-73.998585);
-	private static final LatLng BROOKLYN_BRIDGE = new LatLng(40.7057, -73.9964);
-	private static final LatLng WALL_STREET = new LatLng(40.7064, -74.0094);
-
+	private LatLng SOURCE, DESTINATION;
 
 	public HomeFragment(){}
 	
@@ -157,16 +153,15 @@ public class HomeFragment extends Fragment {
 					googleMap = fragment.getMap();
 
 					MarkerOptions options = new MarkerOptions();
-					options.position(LOWER_MANHATTAN);
-					options.position(BROOKLYN_BRIDGE);
-					options.position(WALL_STREET);
+					options.position(SOURCE);
+					options.position(DESTINATION);
 					googleMap.addMarker(options);
 					String url = getMapsApiDirectionsUrl();
 					ReadTask downloadTask = new ReadTask();
 					downloadTask.execute(url);
 
-					googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BROOKLYN_BRIDGE,
-							13));
+					googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SOURCE,
+							12));
 					addMarkers();
 
 			}
@@ -189,10 +184,10 @@ public class HomeFragment extends Fragment {
 				// TODO Auto-generated method stub
 				imm.hideSoftInputFromWindow(object.getWindowToken(), 0);
 				HashMap<String, String> hm = (HashMap<String, String>)parent.getItemAtPosition(position);
-				Log.v("selected",hm.get("description"));
+				Log.v("selected", hm.get("description"));
 				String selectedLoc = hm.get("description");
 				if(selectedLoc!=null && !selectedLoc.equals("")){
-					new GeocoderTask().execute(selectedLoc);
+					new GeocoderTask(object.getId()).execute(selectedLoc);
 				}
 			}
 		});
@@ -285,7 +280,7 @@ public class HomeFragment extends Fragment {
  	   	try {
  	   			addresses = geocoder.getFromLocation(Lat, Lng, 1);
 				address = addresses.get(0).getAddressLine(1);
-				
+
  	   		} 
  	   	catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -338,7 +333,15 @@ public class HomeFragment extends Fragment {
 	
 	// An AsyncTask class for accessing the GeoCoding Web Service
     private class GeocoderTask extends AsyncTask<String, Void, List<Address>>{
- 
+		String type = "";
+
+		GeocoderTask(int s){
+			if(s==R.id.source)
+				type = "source";
+			else
+				type = "destination";
+		}
+
         @Override
         protected List<Address> doInBackground(String... locationName) {
             // Creating an instance of Geocoder class
@@ -367,32 +370,36 @@ public class HomeFragment extends Fragment {
             Address address = (Address) addresses.get(0);
             
             // Creating an instance of GeoPoint, to display in Google Map
-            latLng = new LatLng(address.getLatitude(), address.getLongitude());
+			if(type=="source")
+				SOURCE = new LatLng(address.getLatitude(), address.getLongitude());
+			else
+				DESTINATION = new LatLng(address.getLatitude(), address.getLongitude());
 
-            String addressText = String.format("%s, %s",
-            address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
-            address.getCountryName());
 
-            markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title(addressText);
-
-            googleMap.addMarker(markerOptions);
-
-            CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
-        	CameraUpdate zoom=CameraUpdateFactory.zoomTo(12);
-
-        	googleMap.moveCamera(center);
-        	googleMap.animateCamera(zoom);
+//            String addressText = String.format("%s, %s",
+//            address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
+//            address.getCountryName());
+//
+//            markerOptions = new MarkerOptions();
+//            markerOptions.position(latLng);
+//            markerOptions.title(addressText);
+//
+//            googleMap.addMarker(markerOptions);
+//
+//            CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
+//        	CameraUpdate zoom=CameraUpdateFactory.zoomTo(12);
+//
+//        	googleMap.moveCamera(center);
+//        	googleMap.animateCamera(zoom);
             
         	//draw Circle
-        	if(mCircle == null || mMarker == null){
-        		drawCircle(latLng);
-            }else{
-                updateMarkerWithCircle(latLng);
-            }
-            
-        	//add markers around
+//        	if(mCircle == null || mMarker == null){
+//        		drawCircle(latLng);
+//            }else{
+//                updateMarkerWithCircle(latLng);
+//            }
+
+			//add markers around
         	addNearByMarkers(latLng);
             
         }
@@ -537,14 +544,13 @@ public class HomeFragment extends Fragment {
 
 	private String getMapsApiDirectionsUrl() {
 		String waypoints = "waypoints=optimize:true|"
-				+ LOWER_MANHATTAN.latitude + "," + LOWER_MANHATTAN.longitude
-				+ "|" + "|" + BROOKLYN_BRIDGE.latitude + ","
-				+ BROOKLYN_BRIDGE.longitude + "|" + WALL_STREET.latitude + ","
-				+ WALL_STREET.longitude;
+				+ SOURCE.latitude + "," + SOURCE.longitude
+				+ "|" + "|" + DESTINATION.latitude + ","
+				+ DESTINATION.longitude;
 
 		String sensor = "sensor=false";
-		String origin = "origin=" + LOWER_MANHATTAN.latitude + "," + LOWER_MANHATTAN.longitude;
-		String destination = "destination=" + WALL_STREET.latitude + "," + WALL_STREET.longitude;
+		String origin = "origin=" + SOURCE.latitude + "," + SOURCE.longitude;
+		String destination = "destination=" + DESTINATION.latitude + "," + DESTINATION.longitude;
 		String params = origin + "&" + destination + "&%20" + waypoints + "&" + sensor;
 		String output = "json";
 
@@ -555,12 +561,10 @@ public class HomeFragment extends Fragment {
 
 	private void addMarkers() {
 		if (googleMap != null) {
-			googleMap.addMarker(new MarkerOptions().position(BROOKLYN_BRIDGE)
-					.title("First Point"));
-			googleMap.addMarker(new MarkerOptions().position(LOWER_MANHATTAN)
-					.title("Second Point"));
-			googleMap.addMarker(new MarkerOptions().position(WALL_STREET)
-					.title("Third Point"));
+			googleMap.addMarker(new MarkerOptions().position(SOURCE)
+					.title("SOURCE"));
+			googleMap.addMarker(new MarkerOptions().position(DESTINATION)
+					.title("DESTINATION"));
 		}
 	}
 
