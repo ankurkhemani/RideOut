@@ -1,0 +1,15 @@
+strict digraph  {
+	graph [ranksep=equally];
+	S -> B;
+	S -> C;
+	B -> D;
+	B -> E;
+	C -> G;
+	C -> F;
+	D -> E;
+	D -> H;
+	E -> K;
+	F -> J;
+	H -> I;
+	I -> G;
+}
