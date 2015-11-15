@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <com.hackathon.cmc.locationplacesautocomplete.CustomAutoCompleteTextView
+        android:id="@+id/source"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"        
+        android:layout_alignParentTop="true"
+        android:hint="Enter Source .. "
+        />
+
+    <com.hackathon.cmc.locationplacesautocomplete.CustomAutoCompleteTextView
+        android:id="@+id/destination"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/source"
+        android:hint="Enter Destination .. "
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/destination"
+        android:text="Search"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/search"/>
+
+    <RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/search"
+		android:id="@+id/map">
+		
+		<!-- The map fragments will go here --> 
+	</RelativeLayout>
+    
+    
+
+</RelativeLayout>
